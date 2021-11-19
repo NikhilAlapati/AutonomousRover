@@ -24,6 +24,9 @@ void Bluetooth::Error(const __FlashStringHelper* err) {
     InitBtModule();
 
 }*/
+/**
+ * Connects to the BT module and initializes it
+ */
 void Bluetooth::InitBtModule() {
     while (!Serial);  // required for Flora & Micro
     delay(500);
@@ -76,25 +79,10 @@ void Bluetooth::InitBtModule() {
     }
     pinMode(LED_BUILTIN, OUTPUT);
 }
-
-// void loop(void) {
-//     GetTerminalInput();
-//     // Check for incoming characters from Bluefruit
-//     char* string = GetInput();
-//     if (strcmp(string, "OK") == 0) {
-//         // no data
-//         return;
-//     }
-//     if (string[0] == 'h') {
-//         digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-//     }
-//     if (strcmp(string, "test") == 0) {
-//         Serial.println("rea");
-//         mySerial.print("AT+BLEUARTTX=");
-//         mySerial.println("bounceBack");
-//     }
-//     mySerial.waitForOK();
-// }
+/**
+ * Gets input from the bluetooth module
+ * @return string of the input
+ */
 char* Bluetooth::GetInput() {
     mySerial.println("AT+BLEUARTRX");
     mySerial.readline();
@@ -107,7 +95,11 @@ char* Bluetooth::GetInput() {
     Serial.println(string);
     return string;
 }
-String Bluetooth::GetTerminalInput() {// Check for user input
+/**
+ * Gets user input from the serial monitor and sends it to the bluetooth
+ * @return returns the string from the terminal
+ */
+String Bluetooth::GetTerminalInput() {
     String input = "";
     while (Serial.available() != 0) {
         input = Serial.readString();

@@ -31,10 +31,16 @@ def stop():
     sleep(0.1)
 
 
+def manualToggle():
+    uart.write(b"m")
+    sleep(0.1)
+
+
 keyboard.add_hotkey("w", moveForward)
 keyboard.add_hotkey("s", moveBack)
 keyboard.add_hotkey("a", moveLeft)
 keyboard.add_hotkey("d", moveRight)
+keyboard.add_hotkey("m", manualToggle)
 keyboard.add_hotkey("space", stop)
 sg.theme('Dark')
 layout = [
