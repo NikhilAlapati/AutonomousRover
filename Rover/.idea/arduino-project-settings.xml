@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Arduino Project Settings">
+    <option name="immediateSend" value="false" />
+    <option name="port" value="COM10" />
+    <option name="serialEndOfLine" value="0" />
+    <option name="showSendOptions" value="false" />
+  </component>
+</project>
