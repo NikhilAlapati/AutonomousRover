@@ -6,7 +6,7 @@ Adafruit_DCMotor* leftMotor = AFMS.getMotor(1);
 Adafruit_DCMotor* rightMotor = AFMS.getMotor(2);
 #define trigPin 3
 #define echoPin 2
-#define speed 150
+#define speed 100
 #define turnSpeed 75
 bool manualDrive = true;
 
@@ -21,7 +21,6 @@ void setup() {
     Serial.println("Motor Shield found.");
     pinMode(trigPin, OUTPUT);
     pinMode(echoPin, INPUT);
-
 }
 /**
  * Moves the motor forward, back, left, and right by manipulating the left and right motor's directions
@@ -64,24 +63,32 @@ void loop() {
     Bluetooth::GetTerminalInput();
     char input = Bluetooth::GetInput()[0];
     //Autonomous Mode
+    float distance = getUltrasonic();
+    Serial.println(distance);
     if (!manualDrive) {
+        moveForward();
         float distance = getUltrasonic();
-        if (distance < 10.0f) {
+        float followDistance = 20.0f;
+        if (distance < followDistance) {
             stop();
             unsigned long direction = random(1);
-            // Determining what direction to turn in
-            if (direction == 0) {
-                moveRight();
-            } else {
-                moveLeft();
-            }
             while (true) {
+                // Determining what direction to turn in
+                if (direction == 0) {
+                    moveRight();
+                } else {
+                    moveLeft();
+                }
+                delay(250);
+                stop();
+                delay(250);
                 distance = getUltrasonic();
-                if (distance > 10.0f) {
+                if (distance > followDistance) {
                     stop();
                     moveForward();
                     break;
                 }
+
             }
         }
     }
@@ -108,6 +115,7 @@ void loop() {
         break;
     case 'm':
         manualDrive = !manualDrive;
+        break;
     default:
         break;
     }
@@ -120,7 +128,6 @@ float getUltrasonic() {
     delayMicroseconds(10); // Added this line
     digitalWrite(trigPin, LOW);
     duration = pulseIn(echoPin, HIGH);
-//     distance = (duration / 2.0f) / 29.14f;
     float soundSpeed = 331.3f + 0.606f * ((analogRead(A0) * 5.0f / 1024.0f - 0.5f) * 100.0f);
     distance = (duration / 20000.0f) * soundSpeed;
 
