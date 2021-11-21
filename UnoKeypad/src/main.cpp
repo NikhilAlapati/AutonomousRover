@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include "keypad.h"
+#include "Keypad.h"
 
 const byte ROWS = 4; //four rows
 const byte COLS = 4; //three columns
@@ -25,7 +25,7 @@ void loop() {
             {
                 switch (kpd.key[i].kstate) {  // Report active key state : IDLE, PRESSED, HOLD, or RELEASED
                 case PRESSED:
-                    Serial.println(kpd.key[i].kchar);
+                    Serial.write(kpd.key[i].kchar);
                     break;
                 case HOLD:
                     break;

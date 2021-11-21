@@ -2,7 +2,10 @@ from time import sleep
 import PySimpleGUI as sg
 import keyboard
 import main as bluetooth
+import serial
+import time
 
+ser = serial.Serial("/dev/ttyACM0", 9600)
 uart = bluetooth.getConnection()
 
 
@@ -51,12 +54,18 @@ layout = [
 window = sg.Window("Demo", layout)
 
 while True:
+    var = ""
+    if ser.in_waiting > 0:
+        var = ser.read()
+        print(var)
     event, values = window.read()
     if event == sg.WIN_CLOSED:
         break
-    if event == "Toggle Headlights":
+    if var == b"1":  # toggleHeadlights
         uart.write(b"h")
     if event == "Reconnect":
         uart = bluetooth.getConnection()
+    del var
 
+ser.close()
 window.close();

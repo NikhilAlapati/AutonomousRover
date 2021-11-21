@@ -1,2 +1,4 @@
 PySimpleGUI~=4.55.1
 keyboard~=0.13.5
+
+pyserial~=3.5
