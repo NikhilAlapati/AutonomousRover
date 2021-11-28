@@ -109,5 +109,9 @@ String Bluetooth::GetTerminalInput() {
     }
     return input;
 }
+void Bluetooth::SendMessages(const String& message) {
+    mySerial.print("AT+BLEUARTTX=");
+    mySerial.println(message);
+}
 
 

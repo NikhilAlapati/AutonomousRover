@@ -22,6 +22,7 @@
 
 class Bluetooth {
  public:
+    static void SendMessages(const String& message);
     static String GetTerminalInput();
     static char* GetInput();
     static void InitBtModule();
