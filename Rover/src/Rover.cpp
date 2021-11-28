@@ -141,27 +141,27 @@ void loop() {
         }
     }
     switch (input) {
-    case 'w':
+    case '2':
         moveForward();
         manualDrive = true;
         break;
-    case 's':
+    case '5':
         moveBackwards();
         manualDrive = true;
         break;
-    case 'a':
+    case '4':
         moveLeft();
         manualDrive = true;
         break;
-    case 'd':
+    case '6':
         moveRight();
         manualDrive = true;
         break;
-    case 'b':
+    case 'B':
         stop();
         manualDrive = true;
         break;
-    case 'm':
+    case 'A':
         manualDrive = !manualDrive;
         break;
     case '*':
