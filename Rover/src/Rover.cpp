@@ -15,7 +15,10 @@ Adafruit_DCMotor* rightMotor = AFMS.getMotor(2);
 #define HEADLIGHTS 10
 #define BRAKE_LIGHTS 13
 #define HORN_PIN 48
+#define SENSOR_INTERVAL 10000
+
 bool manualDrive = true;
+unsigned long prevMillis = 0;
 float getUltrasonic();
 float getTemperature();
 int getPhotocellReading();
@@ -113,6 +116,11 @@ void loop() {
     //Autonomous Mode
     activateHeadlightsIfDark();
     activateBrakeLights();
+    unsigned long currMillis = millis();
+    if (prevMillis == 0 || (currMillis - prevMillis) >= SENSOR_INTERVAL) {
+        sendSensorInformation();
+        prevMillis = currMillis;
+    }
     if (!manualDrive) {
         moveForward();
         float distance = getUltrasonic();
