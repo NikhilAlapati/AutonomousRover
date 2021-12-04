@@ -23,9 +23,11 @@ bool periodicalCollection = true;
 float getUltrasonic();
 float getTemperature();
 int getPhotocellReading();
-bool activateBrakeLights();
+void activateBrakeLights();
 void activateHeadlightsIfDark();
 void sendSensorInformation();
+void turnOnBrakeLight();
+void turnOffBrakeLight();
 void setup() {
     Bluetooth::InitBtModule();
     // Begins the motor shield if not found then loops until it's found
@@ -129,9 +131,12 @@ void loop() {
         float distance = getUltrasonic();
         float followDistance = 20.0f;
         if (distance < followDistance) {
+            activateHeadlightsIfDark();
+            activateBrakeLights();
             stop();
-            unsigned long direction = random(1);
+            unsigned long direction = rand() % 2;
             while (true) {
+                activateHeadlightsIfDark();
                 // Determining what direction to turn in
                 if (direction == 0) {
                     moveRight();
@@ -140,10 +145,13 @@ void loop() {
                 }
                 delay(200);
                 stop();
+                turnOnBrakeLight();
                 delay(200);
+                turnOffBrakeLight();
                 distance = getUltrasonic();
                 if (distance > followDistance) {
                     stop();
+                    activateBrakeLights();
                     moveForward();
                     break;
                 }
@@ -188,15 +196,18 @@ void loop() {
         break;
     }
 }
+void turnOffBrakeLight() {
+    analogWrite(BRAKE_LIGHTS, 0);
+}
+void turnOnBrakeLight() {
+    analogWrite(BRAKE_LIGHTS, 92);
+}
 void sendSensorInformation() {
     sensors_event_t event;
     accel.getEvent(&event);
-    Bluetooth::SendMessages("Ultrasonic Distance in cm: " + (String)getUltrasonic() + "\n");
-    Bluetooth::SendMessages("Temperature Reading in C: " + (String)getTemperature() + "\n");
-    Bluetooth::SendMessages("Accelerometer Reading in m/s^2 (X, Y, Z): " + (String)event.acceleration.x + " " + (String)event.acceleration.y + " "
-                            + (String)event.acceleration.z + "\n");
-    Bluetooth::SendMessages("Photocell Reading: " + (String)getPhotocellReading() + "\n");
-
+    Bluetooth::SendMessages("U: " + (String)getUltrasonic() + "cm T: " + (String)getTemperature()
+                            + "C A(m/s^2):" + (String)event.acceleration.x + " " + (String)event.acceleration.y + " "
+                            + (String)event.acceleration.z + " P:" + (String)getPhotocellReading());
 }
 
 void activateHeadlightsIfDark() {
@@ -225,12 +236,12 @@ float getTemperature() {
 int getPhotocellReading() {
     return analogRead(PHOTOCELL_PIN);
 }
-bool activateBrakeLights() {
+void activateBrakeLights() {
     sensors_event_t event;
     accel.getEvent(&event);
     if (event.acceleration.x <= -2) {
-        analogWrite(BRAKE_LIGHTS, 92);
+        turnOnBrakeLight();
     } else {
-        analogWrite(BRAKE_LIGHTS, 0);
+        turnOffBrakeLight();
     }
 }
