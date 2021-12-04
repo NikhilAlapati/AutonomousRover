@@ -92,6 +92,9 @@ keyboard.add_hotkey("space", stop)
 
 while True:
     var = ""
+    message = uart.read(100)
+    if message:
+        print(message.decode('utf-8'))
     if ser.in_waiting > 0:
         var = ser.read()
         print(var)
