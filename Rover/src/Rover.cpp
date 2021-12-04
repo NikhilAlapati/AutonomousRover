@@ -9,8 +9,8 @@ Adafruit_DCMotor* leftMotor = AFMS.getMotor(1);
 Adafruit_DCMotor* rightMotor = AFMS.getMotor(2);
 #define TRIG_PIN 3
 #define ECHO_PIN 2
-#define SPEED 100
-#define TURN_SPEED 75
+#define SPEED 150
+#define TURN_SPEED 125
 #define PHOTOCELL_PIN 1
 #define HEADLIGHTS 10
 #define BRAKE_LIGHTS 13
@@ -19,6 +19,7 @@ Adafruit_DCMotor* rightMotor = AFMS.getMotor(2);
 
 bool manualDrive = true;
 unsigned long prevMillis = 0;
+bool periodicalCollection = true;
 float getUltrasonic();
 float getTemperature();
 int getPhotocellReading();
@@ -117,9 +118,11 @@ void loop() {
     activateHeadlightsIfDark();
     activateBrakeLights();
     unsigned long currMillis = millis();
-    if (prevMillis == 0 || (currMillis - prevMillis) >= SENSOR_INTERVAL) {
-        sendSensorInformation();
-        prevMillis = currMillis;
+    if (periodicalCollection) {
+        if (prevMillis == 0 || (currMillis - prevMillis) >= SENSOR_INTERVAL) {
+            sendSensorInformation();
+            prevMillis = currMillis;
+        }
     }
     if (!manualDrive) {
         moveForward();
@@ -135,9 +138,9 @@ void loop() {
                 } else {
                     moveLeft();
                 }
-                delay(250);
+                delay(200);
                 stop();
-                delay(250);
+                delay(200);
                 distance = getUltrasonic();
                 if (distance > followDistance) {
                     stop();
@@ -178,6 +181,9 @@ void loop() {
     case '0':
         sendSensorInformation();
         break;
+    case '#':
+        periodicalCollection = !periodicalCollection;
+        Bluetooth::SendMessages("Periodical Collection is " + (String)(!periodicalCollection ? "disabled" : "enabled"));
     default:
         break;
     }
@@ -194,8 +200,8 @@ void sendSensorInformation() {
 }
 
 void activateHeadlightsIfDark() {
-    if (getPhotocellReading() < 150) {
-        analogWrite(HEADLIGHTS, 255);
+    if (getPhotocellReading() < 200) {
+        analogWrite(HEADLIGHTS, 164);
     } else {
         analogWrite(HEADLIGHTS, 0);
     }
@@ -223,7 +229,7 @@ bool activateBrakeLights() {
     sensors_event_t event;
     accel.getEvent(&event);
     if (event.acceleration.x <= -2) {
-        analogWrite(BRAKE_LIGHTS, 150);
+        analogWrite(BRAKE_LIGHTS, 92);
     } else {
         analogWrite(BRAKE_LIGHTS, 0);
     }
