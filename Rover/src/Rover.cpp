@@ -18,6 +18,8 @@ Adafruit_DCMotor* rightMotor = AFMS.getMotor(2);
 #define SENSOR_INTERVAL 10000
 
 bool manualDrive = true;
+bool headlights = false;
+bool headlightOn = true;
 unsigned long prevMillis = 0;
 bool periodicalCollection = true;
 float getUltrasonic();
@@ -28,6 +30,10 @@ void activateHeadlightsIfDark();
 void sendSensorInformation();
 void turnOnBrakeLight();
 void turnOffBrakeLight();
+void activateHeadlights();
+void disableHeadlights();
+void toggleHeadlights();
+void checkHeadLightToggle();
 void setup() {
     Bluetooth::InitBtModule();
     // Begins the motor shield if not found then loops until it's found
@@ -117,7 +123,7 @@ void loop() {
     Bluetooth::GetTerminalInput();
     char input = Bluetooth::GetInput()[0];
     //Autonomous Mode
-    activateHeadlightsIfDark();
+    checkHeadLightToggle();
     activateBrakeLights();
     unsigned long currMillis = millis();
     if (periodicalCollection) {
@@ -131,12 +137,12 @@ void loop() {
         float distance = getUltrasonic();
         float followDistance = 20.0f;
         if (distance < followDistance) {
-            activateHeadlightsIfDark();
+            checkHeadLightToggle();
             activateBrakeLights();
             stop();
             unsigned long direction = rand() % 2;
             while (true) {
-                activateHeadlightsIfDark();
+                checkHeadLightToggle();
                 // Determining what direction to turn in
                 if (direction == 0) {
                     moveRight();
@@ -192,9 +198,32 @@ void loop() {
     case '#':
         periodicalCollection = !periodicalCollection;
         Bluetooth::SendMessages("Periodical Collection is " + (String)(!periodicalCollection ? "disabled" : "enabled"));
+        break;
+    case '7':
+        headlights = true;
+        toggleHeadlights();
+        Bluetooth::SendMessages("Headlight Toggled Automatic headlights off");
+        break;
+    case '9':
+        headlights = false;
+        Bluetooth::SendMessages("Automatic Headlights Turned On");
+        break;
     default:
         break;
     }
+}
+void checkHeadLightToggle() {
+    if (!headlights) {
+        activateHeadlightsIfDark();
+    }
+}
+void toggleHeadlights() {
+    if (headlightOn) {
+        activateHeadlights();
+    } else {
+        disableHeadlights();
+    }
+    headlightOn = !headlightOn;
 }
 void turnOffBrakeLight() {
     analogWrite(BRAKE_LIGHTS, 0);
@@ -205,17 +234,23 @@ void turnOnBrakeLight() {
 void sendSensorInformation() {
     sensors_event_t event;
     accel.getEvent(&event);
-    Bluetooth::SendMessages("U: " + (String)getUltrasonic() + "cm T: " + (String)getTemperature()
-                            + "C A(m/s^2):" + (String)event.acceleration.x + " " + (String)event.acceleration.y + " "
-                            + (String)event.acceleration.z + " P:" + (String)getPhotocellReading());
+    Bluetooth::SendMessages("Distance: " + (String)getUltrasonic() + "cm Temp: " + (String)getTemperature()
+                            + "C Accel(m/s^2):" + (String)event.acceleration.x + " " + (String)event.acceleration.y + " "
+                            + (String)event.acceleration.z + " Photocell:" + (String)getPhotocellReading());
 }
 
 void activateHeadlightsIfDark() {
     if (getPhotocellReading() < 200) {
-        analogWrite(HEADLIGHTS, 164);
+        activateHeadlights();
     } else {
-        analogWrite(HEADLIGHTS, 0);
+        disableHeadlights();
     }
+}
+void disableHeadlights() {
+    analogWrite(HEADLIGHTS, 0);
+}
+void activateHeadlights() {
+    analogWrite(HEADLIGHTS, 164);
 }
 float getUltrasonic() {
     float duration, distance;
