@@ -17,11 +17,14 @@ Adafruit_DCMotor* rightMotor = AFMS.getMotor(2);
 #define HORN_PIN 48
 #define SENSOR_INTERVAL 10000
 
+#define HORN_DURATION 1000
 bool manualDrive = true;
 bool headlights = false;
 bool headlightOn = true;
+unsigned long prevHornMillis = 0;
 unsigned long prevMillis = 0;
 bool periodicalCollection = true;
+bool horn = false;
 float getUltrasonic();
 float getTemperature();
 int getPhotocellReading();
@@ -125,11 +128,18 @@ void loop() {
     //Autonomous Mode
     checkHeadLightToggle();
     activateBrakeLights();
-    unsigned long currMillis = millis();
     if (periodicalCollection) {
+        unsigned long currMillis = millis();
         if (prevMillis == 0 || (currMillis - prevMillis) >= SENSOR_INTERVAL) {
             sendSensorInformation();
             prevMillis = currMillis;
+        }
+    }
+    if (horn) {
+        unsigned long currMillis = millis();
+        if ((currMillis - prevHornMillis) >= HORN_DURATION) {
+            analogWrite(HORN_PIN, 0);
+            horn = false;
         }
     }
     if (!manualDrive) {
@@ -190,7 +200,10 @@ void loop() {
         manualDrive = !manualDrive;
         break;
     case '*':
-        tone(HORN_PIN, 500, 1000);
+        horn = true;
+        prevHornMillis = millis();
+        analogWrite(HORN_PIN, 255);
+//         tone(HORN_PIN, 500, 1000);
         break;
     case '0':
         sendSensorInformation();
