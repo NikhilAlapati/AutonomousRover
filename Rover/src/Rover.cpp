@@ -234,9 +234,9 @@ void turnOnBrakeLight() {
 void sendSensorInformation() {
     sensors_event_t event;
     accel.getEvent(&event);
-    Bluetooth::SendMessages("Distance: " + (String)getUltrasonic() + "cm Temp: " + (String)getTemperature()
-                            + "C Accel(m/s^2):" + (String)event.acceleration.x + " " + (String)event.acceleration.y + " "
-                            + (String)event.acceleration.z + " Photocell:" + (String)getPhotocellReading());
+    Bluetooth::SendMessages("Dist: " + (String)getUltrasonic() + " Temp: " + (String)getTemperature()
+                            + "C Accel:" + (String)event.acceleration.x + " " + (String)event.acceleration.y + " "
+                            + (String)event.acceleration.z + " light:" + (String)getPhotocellReading());
 }
 
 void activateHeadlightsIfDark() {
