@@ -4,4 +4,5 @@ Autonomous Rover created by [Nikhil Alapati](https://github.com/NikhilAlapati/) 
 
 [DEMO VIDEO](https://user-images.githubusercontent.com/35281285/149267973-ff1dcf25-aaf5-4b17-b892-69b5c6a7b0d5.mp4)
 
-![Project Diagram](https://user-images.githubusercontent.com/35281285/150665901-aded72b4-e97f-4662-9ace-6e3ecd06883f.png)
+![Project Diagram](https://user-images.githubusercontent.com/35281285/150665909-b1197522-8703-4f2d-ac3d-5d43c01b9e8e.png)
+
